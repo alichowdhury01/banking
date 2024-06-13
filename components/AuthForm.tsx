@@ -27,6 +27,7 @@ import { getLoggedInUser, signIn, signUp } from '@/lib/actions/user.actions';
 const AuthForm = ({ type }: { type: string }) => {
   const router = useRouter();
   const [user, setUser] = useState(null);
+  const [error, setErrorr] = useState<null | string>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const formSchema = authFormSchema(type);
@@ -53,12 +54,19 @@ const AuthForm = ({ type }: { type: string }) => {
       }
 
       if(type === 'sign-in') {
-        // const response = await signIn({
-        //   email: data.email,
-        //   password: data.password,
-        // })
+        const response = await signIn({
+          email: data.email,
+          password: data.password,
+        })
 
-        // if(response) router.push('/')
+        if(response) router.push('/')
+
+        if(!response) {
+          setErrorr('Invalid email or password. Please try again.');
+          setTimeout(() => {
+            setErrorr(null);
+          }, 3000)
+        }
       }
     } catch (error) {
       console.log(error);
@@ -186,6 +194,7 @@ const AuthForm = ({ type }: { type: string }) => {
                     'Sign Up'
                   )}
                 </Button>
+                {error && <FormMessage className='form-message'>{error}</FormMessage>}
               </div>
             </form>
           </Form>
